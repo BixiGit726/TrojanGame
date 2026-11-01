@@ -168,7 +168,7 @@ const DIFFS={
     dcharge:3,dslam:3,rain:{v:[2,2,3],sp:54,gw:5,step:2,tele:1.2,fall:480,iv:.9},ring:{rings:2,n:10,gap:1.0,v:140},
     infN:2,infW:150,infT:1.15,infD:4.5,
     roar:{2:['crawler','crawler','hopper'],3:['crawler','flyer','hopper','crawler']}},
-  hard:{id:'hard',name:'Trudny',speed:1.3,es:1.4,hp:5,heal:1,inv:1.0,orb:.55,orbEvery:14,bossHeal:2,
+  hard:{id:'hard',name:'Trudny',speed:1.3,es:1.4,hp:5,heal:99,inv:1.0,orb:.55,orbEvery:14,bossHeal:2,
     waves:[{crawler:9,flyer:2},{crawler:6,flyer:6},{crawler:5,flyer:5,hopper:5}],alive:[5,6,7],sgap:.55,
     lunge:.4,lungeV:480,fshoot:3,fspd:215,fchain:1,ftele:.5,hopWave:{h:26,v:270,life:1.5},
     haz:{pe:[5,8],warn:.8,off:3.6,pmax:2,ze:[4.5,7.5],zw:170,zdur:6,ztele:.95,zmax:2,zplat:.35},perma:true,
@@ -178,7 +178,7 @@ const DIFFS={
     infN:3,infW:160,infT:1.0,infD:5,
     roar:{2:['crawler','flyer','hopper'],3:['crawler','flyer','flyer','hopper','crawler']}}
 };
-let D=DIFFS.easy;
+let D=DIFFS.easy,pend='easy';
 
 /* ===== wejście ===== */
 const input={left:false,right:false,jump:false,jumpPressed:false,attackPressed:false};
@@ -843,6 +843,7 @@ const SCREENS={
   keys:()=>'<div class="card"><h2>Sterowanie</h2><dl class="help kk"><dt><kbd>A</kbd> <kbd>D</kbd> / <kbd>←</kbd> <kbd>→</kbd></dt><dd>ruch</dd><dt><kbd>Spacja</kbd> / <kbd>W</kbd></dt><dd>skok (przytrzymaj, by wyżej)</dd><dt><kbd>J</kbd> / <kbd>X</kbd> / klik</dt><dd>cios kursorem</dd><dt><kbd>P</kbd></dt><dd>pauza</dd></dl><dl class="help tk"><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>ruch</dd><dt><kbd>Skok</kbd></dt><dd>skok (przytrzymaj, by wyżej)</dd><dt><kbd>Cios</kbd></dt><dd>cios kursorem</dd><dt><kbd>Pauza</kbd></dt><dd>przycisk nad planszą</dd></dl><button class="cta" data-act="menu" type="button">Wróć</button></div>',
   pause:()=>'<div class="card"><h2>Pauza</h2><button class="cta" data-act="resume" type="button">Wracam do gry</button></div>',
   dead:()=>'<div class="card"><span class="eyebrow">Wirus wygrał rundę</span><h2>Zainfekowana</h2><p>'+(D.perma?'Poziom trudny nie wybacza: zaczynasz całkiem od początku, od fali 1.':'Zaczynasz od tego samego miejsca, z pełnym zdrowiem.')+'</p><button class="cta" data-act="retry" type="button">'+(D.perma?'Od początku':'Jeszcze raz')+'</button></div>',
+  warn:()=>'<div class="card"><span class="eyebrow">Uwaga</span><h2>Poziom dla starszych dzieci</h2><p>Poziom „'+DIFFS[pend].name+'” jest trudniejszy i przeznaczony dla starszych dzieci.'+(DIFFS[pend].perma?' Po porażce wracasz do fali 1.':'')+' Młodsze lepiej niech zaczną od poziomu Łatwego.</p><div class="mlist"><button class="cta" data-act="diff" type="button">Wróć do wyboru</button><button class="cta alt" data-act="go" type="button">Zagraj mimo to</button></div></div>',
   diff:()=>'<div class="card"><h2>Poziom trudności</h2><div class="mlist dl">'+
     '<button class="cta" data-act="pick" data-d="easy" type="button">Łatwy<span class="dsub">Domyślny · tak jak dotychczas</span></button>'+
     '<button class="cta alt" data-act="pick" data-d="normal" type="button">Średni<span class="dsub">Szybciej, sprytniejsze wirusy, zmienna plansza</span></button>'+
@@ -850,7 +851,7 @@ const SCREENS={
     '<button class="cta alt" data-act="menu" type="button">Wróć</button></div></div>',
   win:()=>'<div class="card" style="gap:inherit"><svg class="picto" viewBox="0 0 130 100" aria-hidden="true"><rect x="8" y="28" width="72" height="50" rx="5"/><path d="M8 33l36 25 36-25"/><circle cx="84" cy="44" r="24"/><circle cx="84" cy="44" r="5"/><path d="M84 33v4M84 51v4M73 44h4M91 44h4M76.5 36.5l2.8 2.8M89 49l2.8 2.8M91.5 36.5l-2.8 2.8M79 49l-2.8 2.8"/><path d="M102 62l20 22" stroke-width="7"/></svg><p class="warn">Uważaj w co klikasz!</p><span class="stats">'+D.name+' · Czas '+mmss(stats.time)+' · Podejścia '+(stats.deaths+1)+'</span><button class="cta" data-act="again" type="button">Zagraj jeszcze raz</button></div>'
 };
-function showOv(k){ov.className='ov'+(k==='win'?' end':k==='boot'?' boot':(k==='title'||k==='keys'||k==='diff')?' menu':'');ov.innerHTML=k?SCREENS[k]():'';ov.hidden=!k;if(k){const b=ov.querySelector('[data-act]');if(b)setTimeout(()=>b.focus({preventScroll:true}),30)}}
+function showOv(k){ov.className='ov'+(k==='win'?' end':k==='boot'?' boot':(k==='title'||k==='keys'||k==='diff'||k==='warn')?' menu':'');ov.innerHTML=k?SCREENS[k]():'';ov.hidden=!k;if(k){const b=ov.querySelector('[data-act]');if(b)setTimeout(()=>b.focus({preventScroll:true}),30)}}
 function newGame(keep){stats={time:0,deaths:keep?stats.deaths:0};resetPlayer();startWave(0,false);clearInput();state='play';showOv(null)}
 function retry(){if(D.perma){newGame(true);return}clearInput();if(cp.kind==='wave')startWave(cp.i,false);else{resetPlayer();startBossIntro()}state='play';showOv(null)}
 function pause(){if(state!=='play'||P.dead)return;clearInput();state='pause';showOv('pause')}
@@ -859,7 +860,7 @@ function win(){state='win';sfx.win();Snd.setBoss(false);resetHazards();showOv('w
 ov.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;
   Snd.init();const a=b.dataset.act;
-  if(a==='start')showOv('diff');else if(a==='pick'){D=DIFFS[b.dataset.d]||DIFFS.easy;startCut()}else if(a==='again'){state='title';showOv('diff')}else if(a==='retry')retry();else if(a==='resume')resume();else if(a==='keys')showOv('keys');else if(a==='menu')showOv('title');else if(a==='snd')toggleSnd();
+  if(a==='start')showOv('diff');else if(a==='pick'){const d=b.dataset.d||'easy';if(d==='easy'){D=DIFFS.easy;startCut()}else{pend=d;showOv('warn')}}else if(a==='go'){D=DIFFS[pend]||DIFFS.easy;startCut()}else if(a==='diff')showOv('diff');else if(a==='again'){state='title';showOv('diff')}else if(a==='retry')retry();else if(a==='resume')resume();else if(a==='keys')showOv('keys');else if(a==='menu')showOv('title');else if(a==='snd')toggleSnd();
 });
 $('bPause').addEventListener('click',()=>{if(state==='pause')resume();else pause()});
 function toggleSnd(){Snd.init();Snd.setOn(!Snd.on);const t='Dźwięk: '+(Snd.on?'wł.':'wył.');$('bSnd').textContent=t;const m=ov.querySelector('[data-act="snd"]');if(m)m.textContent=t}
